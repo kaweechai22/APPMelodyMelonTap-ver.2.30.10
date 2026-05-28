@@ -122,7 +122,7 @@
 <script>
 let lastKnockTimeV2483 = -Infinity;
 
-/* ===== v24.8.6 Stable Knock Trigger =====
+/* ===== v24.9.0 Stable Knock Trigger =====
    เป้าหมาย: ป้องกันเคาะ 1 ครั้ง แต่นับเป็น 2 ครั้ง จาก echo/rebound/decay
    หลักการ:
    - ใช้ RMS envelope หา hit จริง
@@ -273,7 +273,7 @@ function extractBestKnockSegmentV2483(samples, sr){
     segment: samples.slice(start, end),
     knockCount: knocks.length,
     triggerDebug: {
-      mode: "stable_trigger_v24.8.6",
+      mode: "stable_trigger_v24.9.0",
       noiseFloor: main.noiseFloor,
       threshold: main.threshold,
       acceptedTimes: knocks.map(k => Number(k.t.toFixed(3))),
@@ -538,7 +538,7 @@ function loop(){
   const rms = getRMS(timeData);
   const now = performance.now();
 
-  // v24.8.6 dynamic noise tracking เฉพาะตอนยังไม่จับ event
+  // v24.9.0 dynamic noise tracking เฉพาะตอนยังไม่จับ event
   if(captureState === "idle"){
     noiseFloor = 0.97 * noiseFloor + 0.03 * rms;
   }
@@ -558,7 +558,7 @@ function loop(){
       captureState = "capturing";
       eventFrames = [];
       window.triggerDebugV2483 = {
-        mode: "live_stable_trigger_v24.8.6",
+        mode: "live_stable_trigger_v24.9.0",
         noiseFloor,
         threshold: dynamicThreshold,
         firstRms: rms,
@@ -586,7 +586,7 @@ function loop(){
       const feat = extractFeaturesFromEvent(eventFrames);
 
       if(feat){
-        feat.triggerMode = "live_stable_trigger_v24.8.6";
+        feat.triggerMode = "live_stable_trigger_v24.9.0";
         feat.triggerThreshold = dynamicThreshold;
         feat.triggerNoiseFloor = noiseFloor;
         feat.triggerRms = rms;
@@ -802,7 +802,7 @@ function calibrateJuiceFieldV227(rawJuice, Q, fMean, fStd, hollowIndex, lowRatio
 
 
 function classifyRipenessV248_TEST9(lowRatio, highRatio, brix, firmness, juice, hollowPercent, fMean, fPeak, fStd, hollowIndex, flatness, rolloff85, peakCount){
-  // v24.8.6 Conservative-Ripe Patch
+  // v24.9.0 Conservative-Ripe Patch
   // ปัญหาเดิม: แตงจริงสุกพอดี แต่แอปทายสุกเกิน
   // แนวทาง: ลดการออก A ให้มากที่สุด และให้ C เป็น default ในโซนกลาง
   // หมายเหตุ: ไม่แตะโมเดล Brix/Firmness/Juice
@@ -888,7 +888,7 @@ function getRipenessExtraNoteV248(fMean, group, hollowPercent, firmness, lowRati
     notes.push("C_hard_protection: อยู่ในโซนกลาง จึงป้องกัน false สุกเกิน");
   }
   if(group === "A"){
-    notes.push("very_strong_overripe_only: v24.8.6 ให้สุกเกินเฉพาะเมื่อ f_mean ต่ำมากและสัญญาณโพรง/เนื้อหลวมแรงมาก");
+    notes.push("very_strong_overripe_only: v24.9.0 ให้สุกเกินเฉพาะเมื่อ f_mean ต่ำมากและสัญญาณโพรง/เนื้อหลวมแรงมาก");
   }
   if(group === "B" && fm < 475){
     notes.push("B_conservative: ต่ำกว่าช่วงสุกพอดี แต่ยังไม่ฟันธงสุกเกิน");
@@ -954,6 +954,13 @@ function analyzeSession(){
   const hollowPercentOriginal = hollowPercent;
   hollowPercent = calibrateHollowFieldV227(hollowPercentField);
 
+  // v24.9.0 overripe-hollow consistency:
+  // จากข้อมูลภาคสนามของผู้ใช้ ลูกที่สุกเกินมักมีโพรง/เนื้อหลวมร่วมด้วย
+  // ถ้าผลเป็น A/สุกเกิน แต่ hollow ต่ำเกินไป ให้ยกระดับเป็น "เสี่ยงมีโพรง" ขั้นต่ำ
+  if(group === "A"){
+    hollowPercent = Math.max(hollowPercent, 18);
+  }
+
   const ripe=ripenessFromGroup(group);
 
   const isBoundaryRipeness = isBoundaryNearRipe(
@@ -985,9 +992,38 @@ function analyzeSession(){
 
   const sweetStars=toStars(brix,8,14), firmStars=toStars(crispPct,0,100), juiceStars=toStars(juice,50,86), hollowStars=5-toStars(hollowPercent,0,35), confStars=toStars(conf,25,95);
   let melonScore=.30*(brix/14*100)+.20*crispPct+.15*juice+.15*conf+.20*(100-hollowPercent*2.5);
-  if(group==="A")melonScore-=15;if(hollowPercent>20)melonScore-=20;if(sigScore<55)melonScore-=10;melonScore=Math.round(clamp(melonScore,0,100));
+
+  // v24.9.0 quality consistency:
+  // ถ้าระดับความสุกเป็น A/สุกเกิน ต้องไม่ให้คุณภาพรวมขึ้นว่าดีหรือน่าซื้อ
+  if(group==="A"){
+    melonScore = Math.min(melonScore - 35, 49);
+  }
+
+  if(hollowPercent>20)melonScore-=20;
+  if(sigScore<55)melonScore-=10;
+  melonScore=Math.round(clamp(melonScore,0,100));
+
   const qualityText=qualityLevelText(melonScore);
-  let buyText,buyClass,scoreExplain;if(melonScore>=78&&hollowPercent<12&&(group==="C"||group==="B")){buyText="น่าซื้อ";buyClass="buy";scoreExplain="คุณภาพโดยรวมดี เหมาะเลือกซื้อ";}else if(melonScore>=58&&hollowPercent<20&&group!=="A"){buyText="พิจารณาได้";buyClass="maybe";scoreExplain="คุณภาพพอใช้ ควรดูสภาพภายนอกประกอบ";}else{buyText="ไม่ค่อยแนะนำ";buyClass="no";scoreExplain="ความเสี่ยงด้านคุณภาพค่อนข้างสูง";}
+  let buyText,buyClass,scoreExplain;
+
+  if(group==="A"){
+    buyText="ไม่ค่อยแนะนำ";
+    buyClass="no";
+    scoreExplain="ผลการสุกเป็นสุกเกิน และกลุ่มนี้มักสัมพันธ์กับเนื้อหลวมหรือโพรงภายใน จึงจัดคุณภาพรวมเป็นไม่ดีเพื่อไม่ให้ขัดแย้งกับผลการวิเคราะห์";
+  }else if(melonScore>=78&&hollowPercent<12&&(group==="C"||group==="B")){
+    buyText="น่าซื้อ";
+    buyClass="buy";
+    scoreExplain="คุณภาพโดยรวมดี เหมาะเลือกซื้อ";
+  }else if(melonScore>=58&&hollowPercent<20&&group!=="A"){
+    buyText="พิจารณาได้";
+    buyClass="maybe";
+    scoreExplain="คุณภาพพอใช้ ควรดูสภาพภายนอกประกอบ";
+  }else{
+    buyText="ไม่ค่อยแนะนำ";
+    buyClass="no";
+    scoreExplain="ความเสี่ยงด้านคุณภาพค่อนข้างสูง";
+  }
+
   if(warnLowQuality){scoreExplain += " • หมายเหตุ: สัญญาณรอบนี้ไม่นิ่ง ควรวัดซ้ำเพื่อยืนยัน";}
 
   updateWatermelonColor(ripe.flesh);
@@ -1008,9 +1044,20 @@ function analyzeSession(){
   document.getElementById("confVal").innerText=`${conf.toFixed(0)} %`;document.getElementById("groupVal").innerText=`ช่วงสุก: ${group}`;
   setBar("brixBar",brix/14*100);setBar("firmBar",crispPct);setBar("juiceBar",juice);setBar("hollowBar",100-hollowPercent*2.5);setBar("confBar",conf);
   document.getElementById("featureList").innerHTML=`
-    <li>Q: ${Quse.toFixed(2)}</li><li>tau: ${tauUsed.toFixed(3)}</li><li>f_peak: ${avg.fPeak.toFixed(1)} Hz</li><li>f_mean: ${fMeanUse.toFixed(1)} Hz <b>(ใช้จำแนกระดับการสุก)</b></li><li>ripeness_extra_note: ${ripenessExtraNoteV248 || "-"}</li><li>f_std: ${fStdUse.toFixed(1)} Hz</li><li>f_variance: ${fVarUse.toFixed(1)}</li><li>hollow_index: ${hollowIndexUse.toFixed(3)}</li><li>Brix raw: ${brixRaw.toFixed(2)} °Bx → calibrated: ${brix.toFixed(2)} °Bx</li><li>Firmness raw model: ${firmnessRaw.toFixed(1)} N → calibrated: ${firmness.toFixed(1)} N</li><li>Juice raw: ${juiceRaw.toFixed(1)}% → calibrated: ${juice.toFixed(1)}%</li><li>Hollow raw: ${hollowRawPercent.toFixed(1)}% → v22.5: ${hollowPercentOriginal.toFixed(1)}% → v22.6: ${hollowPercent.toFixed(1)}%</li><li>high_ratio: ${highRatioUse.toFixed(3)}</li><li>low_ratio: ${lowRatioUse.toFixed(3)}</li><li>flatness: ${flatnessUse.toFixed(3)}</li><li>rolloff85: ${rolloff85Use.toFixed(1)} Hz</li><li>peak count: ${peakCountUse.toFixed(0)}</li><li>low_ratio: ${avg.lowRatio.toFixed(3)}</li><li>flatness: ${avg.flatness.toFixed(3)}</li><li>Audio120 ripeness label: ${ripenessLabel120}</li><li>Final ripeness group: ${group} (v24.8.6 conservative-ripe rule)</li><li>Perfect ripe meter: ${ripeMeter.toFixed(0)}/100</li><li>คุณภาพสัญญาณ: ${sigLabel} (${sigScore.toFixed(0)}%)</li><li>Q spread: ${qSpread.toFixed(2)}</li><li>tau fallback: ${tauFallbackCount}/${NUM_TAPS}</li><li>สถานะผล: ${warnLowQuality ? "ใช้ได้แต่ควรวัดซ้ำเพื่อยืนยัน" : "ใช้ได้"}</li>`;
+    <li>Q: ${Quse.toFixed(2)}</li><li>tau: ${tauUsed.toFixed(3)}</li><li>f_peak: ${avg.fPeak.toFixed(1)} Hz</li><li>f_mean: ${fMeanUse.toFixed(1)} Hz <b>(ใช้จำแนกระดับการสุก)</b></li><li>ripeness_extra_note: ${ripenessExtraNoteV248 || "-"}</li><li>f_std: ${fStdUse.toFixed(1)} Hz</li><li>f_variance: ${fVarUse.toFixed(1)}</li><li>hollow_index: ${hollowIndexUse.toFixed(3)}</li><li>Brix raw: ${brixRaw.toFixed(2)} °Bx → calibrated: ${brix.toFixed(2)} °Bx</li><li>Firmness raw model: ${firmnessRaw.toFixed(1)} N → calibrated: ${firmness.toFixed(1)} N</li><li>Juice raw: ${juiceRaw.toFixed(1)}% → calibrated: ${juice.toFixed(1)}%</li><li>Hollow raw: ${hollowRawPercent.toFixed(1)}% → v22.5: ${hollowPercentOriginal.toFixed(1)}% → v22.6: ${hollowPercent.toFixed(1)}%</li><li>high_ratio: ${highRatioUse.toFixed(3)}</li><li>low_ratio: ${lowRatioUse.toFixed(3)}</li><li>flatness: ${flatnessUse.toFixed(3)}</li><li>rolloff85: ${rolloff85Use.toFixed(1)} Hz</li><li>peak count: ${peakCountUse.toFixed(0)}</li><li>low_ratio: ${avg.lowRatio.toFixed(3)}</li><li>flatness: ${avg.flatness.toFixed(3)}</li><li>Audio120 ripeness label: ${ripenessLabel120}</li><li>Final ripeness group: ${group} (v24.9.0 warning-phrase rule)</li><li>Perfect ripe meter: ${ripeMeter.toFixed(0)}/100</li><li>คุณภาพสัญญาณ: ${sigLabel} (${sigScore.toFixed(0)}%)</li><li>Q spread: ${qSpread.toFixed(2)}</li><li>tau fallback: ${tauFallbackCount}/${NUM_TAPS}</li><li>สถานะผล: ${warnLowQuality ? "ใช้ได้แต่ควรวัดซ้ำเพื่อยืนยัน" : "ใช้ได้"}</li>`;
   saveHistory(ripe.label,brix,conf,melonScore,buyText,sigScore);
-  speakSummaryAI({ripenessText:(ripenessExtraText || (group==="C" ? "แตงโมลูกนี้อยู่ในช่วงสุกพอดี" : ((group==="A"||group==="B") ? "แตงโมลูกนี้มีแนวโน้มสุกเกิน" : "แตงโมลูกนี้ใกล้สุก"))), sweetnessText:sweetnessLabel(brix), crispText, juiceText:juiceLabel(juice), hollowText, qualityText, hollowPercent});
+  speakSummaryAI({
+    group,
+    ripenessText:(ripenessExtraText || (group==="C" ? "แตงโมลูกนี้อยู่ในช่วงสุกพอดี" : (group==="A" ? "แตงโมลูกนี้มีแนวโน้มสุกเกิน" : (group==="B" ? "แตงโมลูกนี้สุกจัด" : "แตงโมลูกนี้ใกล้สุก")))),
+    sweetnessText:sweetnessLabel(brix),
+    crispText,
+    juiceText:juiceLabel(juice),
+    hollowText,
+    qualityText,
+    hollowPercent,
+    melonScore,
+    buyText
+  });
   
   saveMeasurementDebug({
     timestamp: new Date().toISOString(),
@@ -1145,24 +1192,48 @@ function playWarningBeep(level="medium"){
 function speakSummaryAI(summary){
   const warning = getHollowWarningByPercent(summary.hollowPercent);
 
-  const parts = [
-    summary.ripenessText,
-    summary.sweetnessText,
-    summary.crispText,
-    summary.juiceText
-  ];
+  // v24.9.0 voice consistency:
+  // ถ้าผลการสุกเป็น A/สุกเกิน เสียง AI ต้องสรุปว่าไม่แนะนำ/คุณภาพไม่ดี
+  // ไม่อ่านความหวาน-กรอบ-ฉ่ำในเชิงบวกจนขัดแย้งกับผลหลัก
+  let parts = [];
 
-  if(warning.text){
-    parts.push(warning.text);
+  if(summary.group === "A"){
+    parts = [
+      "ผลวิเคราะห์พบว่าแตงโมลูกนี้มีแนวโน้มสุกเกิน",
+      "สุกเกิน ระวัง อาจมีโพรงภายใน",
+      "คุณภาพรวมจัดว่าไม่ดี",
+      "ไม่ค่อยแนะนำให้เลือกซื้อหรือรับประทานเป็นลูกคุณภาพดี"
+    ];
+
+    if(warning.text){
+      parts.push(warning.text);
+    }else{
+      parts.push("สุกเกิน ระวัง อาจมีโพรงภายใน");
+    }
+  }else{
+    parts = [
+      summary.ripenessText,
+      summary.sweetnessText,
+      summary.crispText,
+      summary.juiceText
+    ];
+
+    if(warning.text){
+      parts.push(warning.text);
+    }
+
+    parts.push(summary.qualityText);
+
+    if(summary.buyText){
+      parts.push(summary.buyText);
+    }
   }
-
-  parts.push(summary.qualityText);
 
   const text = parts.filter(Boolean).join(", ");
 
-  if(warning.text){
-    playWarningBeep(warning.level);
-    setTimeout(() => speakText(text), warning.level === "high" ? 750 : 500);
+  if(warning.text || summary.group === "A"){
+    playWarningBeep(summary.group === "A" ? "high" : warning.level);
+    setTimeout(() => speakText(text), summary.group === "A" ? 750 : (warning.level === "high" ? 750 : 500));
   }else{
     speakText(text);
   }
@@ -1290,7 +1361,7 @@ function getTriggerDebugTextV2483(features){
   if(!features || !features.trigger_debug) return "";
   const d = features.trigger_debug;
   const times = (d.acceptedTimes || []).join(", ");
-  return `Trigger v24.8.6: ${d.mode || "-"} | เคาะจริงที่รับ: ${features.knock_count ?? "-"} | threshold=${Number(d.threshold||0).toFixed(4)} | noise=${Number(d.noiseFloor||0).toFixed(4)} | times=[${times}]`;
+  return `Trigger v24.9.0: ${d.mode || "-"} | เคาะจริงที่รับ: ${features.knock_count ?? "-"} | threshold=${Number(d.threshold||0).toFixed(4)} | noise=${Number(d.noiseFloor||0).toFixed(4)} | times=[${times}]`;
 }
 
 </script>
