@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>MelodyMelonTap v2.29.8 Remove Test Beep Button</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.png"/><meta name="theme-color" content="#df1f2d"/><style>
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>MelodyMelonTap v2.30.0 Modern Icon UI</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.png"/><meta name="theme-color" content="#df1f2d"/><style>
 :root{
   --theme:#df1f2d; --theme2:#ff4d5e; --soft:#fff1f2; --soft2:#ffe4e6;
   --ink:#1f2933; --muted:#6b7280; --card:#ffffff; --line:#eceff3;
@@ -931,6 +931,81 @@ summary{padding:18px 18px}
   .aiTitle{font-size:1.36rem}
 }
 
+
+/* ===== v2.30.0 Modern Symbol UI ===== */
+.homeStartBtn .soundMark{
+  display:grid;
+  place-items:center;
+  width:46px;
+  height:46px;
+  color:#fff;
+  opacity:1;
+  filter:drop-shadow(0 5px 10px rgba(0,0,0,.14));
+}
+.homeStartBtn .soundMark .startWaveIcon{width:44px;height:44px}
+.primaryBtn .startIcon{
+  color:#fff!important;
+  background:linear-gradient(135deg,var(--theme),var(--theme2))!important;
+  box-shadow:0 8px 18px color-mix(in srgb,var(--theme) 28%, transparent);
+}
+.primaryBtn .startIcon .startWaveIcon{width:30px;height:30px}
+.featureIcon,.mIcon{
+  position:relative;
+  overflow:hidden;
+  border:0!important;
+  isolation:isolate;
+}
+.featureIcon::before,.mIcon::before{
+  content:"";
+  position:absolute;
+  inset:6px 8px auto 8px;
+  height:40%;
+  border-radius:999px;
+  background:rgba(255,255,255,.55);
+  filter:blur(8px);
+  z-index:0;
+}
+.iconSvg{
+  width:62%;
+  height:62%;
+  display:block;
+  position:relative;
+  z-index:1;
+  filter:drop-shadow(0 5px 8px rgba(0,0,0,.14));
+}
+.featureIcon.iconSweet,.mIcon.iconSweet{background:radial-gradient(circle at 32% 25%,#fff 0 6%,#ffe4ed 20%,#ffd3e1 72%,#ffc2d5 100%);color:#ff4e7c}
+.featureIcon.iconCrisp,.mIcon.iconCrisp{background:radial-gradient(circle at 32% 25%,#fff 0 6%,#fff5cc 22%,#ffe18a 75%,#ffc857 100%);color:#f5a900}
+.featureIcon.iconJuice,.mIcon.iconJuice{background:radial-gradient(circle at 32% 25%,#fff 0 6%,#dff4ff 20%,#aee2ff 75%,#70c7ff 100%);color:#1fa7ff}
+.featureIcon.iconHollow,.mIcon.iconHollow{background:radial-gradient(circle at 32% 25%,#fff 0 6%,#f0ddff 20%,#d5b4ff 75%,#b887f2 100%);color:#8b50d9}
+.featureIcon.iconTrust,.mIcon.iconTrust{background:radial-gradient(circle at 32% 25%,#fff 0 6%,#ddf8df 20%,#b8edbd 75%,#83d889 100%);color:#28a548}
+.featureCard{
+  position:relative;
+  border-radius:22px!important;
+}
+.featureCard::after{
+  content:"";
+  display:block;
+  width:38px;
+  height:5px;
+  border-radius:999px;
+  margin:8px auto 0;
+  background:currentColor;
+  opacity:.72;
+}
+.featureCard:nth-child(1){color:#ff4e7c}
+.featureCard:nth-child(2){color:#f5a900}
+.featureCard:nth-child(3){color:#1fa7ff}
+.featureCard:nth-child(4){color:#8b50d9}
+.featureCard:nth-child(5){color:#28a548}
+.featureTitle{color:#1f2937!important}
+.featureStars{display:none!important}
+@media(max-width:420px){
+  .featureIcon{width:52px!important;height:52px!important}
+  .iconSvg{width:64%;height:64%}
+  .homeStartBtn .soundMark{width:40px;height:40px}
+  .homeStartBtn .soundMark .startWaveIcon{width:40px;height:40px}
+}
+
 </style></head><body><div class="bgFruit"></div><div class="wrap">
 <header class="topbar"><button class="iconBtn" aria-label="เมนู">☰</button><div class="brand">Melody<span class="red">Melon</span>Tap <span class="melon">🍉</span></div><button class="iconBtn" id="shareBtn" aria-label="แชร์">⇧</button></header>
 
@@ -949,7 +1024,11 @@ summary{padding:18px 18px}
 
     <button id="homeStartBtn" class="homeStartBtn" type="button">
       <span class="startLabel">เริ่มวัด</span>
-      <span class="soundMark">〰</span>
+      <span class="soundMark" aria-hidden="true"><svg class="startWaveIcon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round">
+    <path d="M12 32v0"/><path d="M22 24v16"/><path d="M32 14v36"/><path d="M42 22v20"/><path d="M52 30v4"/>
+  </g>
+</svg></span>
     </button>
 
     <button id="homePreviewBtn" class="homePreviewLink" type="button">ดูตัวอย่างผลลัพธ์ &nbsp;›</button>
@@ -957,27 +1036,49 @@ summary{padding:18px 18px}
     <div class="sectionDivider"><span class="dot">•</span> แอปจะบอกอะไรบ้าง <span class="dot">•</span></div>
     <div class="featureGrid">
       <div class="featureCard">
-        <div class="featureIcon">Bx</div>
+        <div class="featureIcon iconSweet"><svg class="iconSvg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <path d="M32 52C20 42 12 35 12 25c0-7 5-12 12-12 4 0 7 2 8 5 2-3 5-5 9-5 7 0 12 5 12 12 0 10-8 17-21 27z" fill="currentColor"/>
+  <rect x="40" y="40" width="10" height="10" rx="2" fill="currentColor" opacity=".45"/>
+  <rect x="48" y="34" width="8" height="8" rx="2" fill="currentColor" opacity=".28"/>
+  <path d="M17 22l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z" fill="#fff" opacity=".85"/>
+</svg></div>
         <div class="featureTitle">ความหวาน</div>
         <div class="featureStars">★★★☆☆</div>
       </div>
       <div class="featureCard">
-        <div class="featureIcon">✦</div>
+        <div class="featureIcon iconCrisp"><svg class="iconSvg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <path d="M13 40l20-28 18 10-15 30-23-12z" fill="currentColor"/>
+  <path d="M24 36l15-18M31 46l13-22" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+  <path d="M14 18l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4zm39 20l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z" fill="currentColor" opacity=".55"/>
+</svg></div>
         <div class="featureTitle">ความกรอบ</div>
         <div class="featureStars">★★★☆☆</div>
       </div>
       <div class="featureCard">
-        <div class="featureIcon">💧</div>
+        <div class="featureIcon iconJuice"><svg class="iconSvg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <path d="M32 8C24 20 17 29 17 39c0 10 7 17 15 17s15-7 15-17C47 29 40 20 32 8z" fill="currentColor"/>
+  <path d="M23 42c6 5 13 5 19 0" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+  <path d="M42 14c5 5 7 8 8 13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".45"/>
+  <circle cx="50" cy="19" r="3" fill="currentColor" opacity=".55"/>
+</svg></div>
         <div class="featureTitle">ความฉ่ำ</div>
         <div class="featureStars">★★★☆☆</div>
       </div>
       <div class="featureCard">
-        <div class="featureIcon">◌</div>
+        <div class="featureIcon iconHollow"><svg class="iconSvg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <circle cx="32" cy="32" r="22" fill="currentColor" opacity=".78"/>
+  <circle cx="32" cy="32" r="11" fill="#fff" opacity=".9"/>
+  <circle cx="32" cy="32" r="8" fill="currentColor"/>
+  <g fill="#fff" opacity=".38"><circle cx="20" cy="23" r="1.7"/><circle cx="45" cy="25" r="1.7"/><circle cx="18" cy="40" r="1.4"/><circle cx="43" cy="44" r="1.4"/><circle cx="27" cy="15" r="1.2"/><circle cx="37" cy="50" r="1.2"/></g>
+</svg></div>
         <div class="featureTitle">โพรงภายใน</div>
         <div class="featureStars">★★★☆☆</div>
       </div>
       <div class="featureCard">
-        <div class="featureIcon">🛡</div>
+        <div class="featureIcon iconTrust"><svg class="iconSvg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <path d="M32 8l22 8v14c0 14-9 24-22 29C19 54 10 44 10 30V16l22-8z" fill="currentColor"/>
+  <path d="M22 32l7 7 14-16" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></div>
         <div class="featureTitle">ความเชื่อมั่น</div>
         <div class="featureStars">★★★☆☆</div>
       </div>
@@ -1026,7 +1127,11 @@ summary{padding:18px 18px}
   </div>
 
   <div class="measureActions">
-    <button id="startBtn" class="btn primaryBtn" type="button"><span class="startIcon">🎙️</span><span id="startBtnLabel" class="startText">เริ่มวัด</span></button>
+    <button id="startBtn" class="btn primaryBtn" type="button"><span class="startIcon" aria-hidden="true"><svg class="startWaveIcon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round">
+    <path d="M12 32v0"/><path d="M22 24v16"/><path d="M32 14v36"/><path d="M42 22v20"/><path d="M52 30v4"/>
+  </g>
+</svg></span><span id="startBtnLabel" class="startText">เริ่มวัด</span></button>
     <button id="resetBtn" class="btn secondaryBtn" type="button">↺ เริ่มวัดใหม่</button>
   </div>
 
@@ -1039,7 +1144,12 @@ summary{padding:18px 18px}
 
 <section class="metrics">
   <div class="metric">
-    <div class="mIcon">Bx</div>
+    <div class="mIcon iconSweet"><svg class="iconSvg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <path d="M32 52C20 42 12 35 12 25c0-7 5-12 12-12 4 0 7 2 8 5 2-3 5-5 9-5 7 0 12 5 12 12 0 10-8 17-21 27z" fill="currentColor"/>
+  <rect x="40" y="40" width="10" height="10" rx="2" fill="currentColor" opacity=".45"/>
+  <rect x="48" y="34" width="8" height="8" rx="2" fill="currentColor" opacity=".28"/>
+  <path d="M17 22l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z" fill="#fff" opacity=".85"/>
+</svg></div>
     <div class="mMain">
       <div class="mLabel">ความหวาน</div>
       <div id="brixVal" class="mValue">-</div>
@@ -1049,7 +1159,11 @@ summary{padding:18px 18px}
     </div>
   </div>
   <div class="metric">
-    <div class="mIcon">✦</div>
+    <div class="mIcon iconCrisp"><svg class="iconSvg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <path d="M13 40l20-28 18 10-15 30-23-12z" fill="currentColor"/>
+  <path d="M24 36l15-18M31 46l13-22" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+  <path d="M14 18l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4zm39 20l2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4z" fill="currentColor" opacity=".55"/>
+</svg></div>
     <div class="mMain">
       <div class="mLabel">ความกรอบ</div>
       <div id="firmVal" class="mValue">-</div>
@@ -1059,7 +1173,12 @@ summary{padding:18px 18px}
     </div>
   </div>
   <div class="metric">
-    <div class="mIcon">💧</div>
+    <div class="mIcon iconJuice"><svg class="iconSvg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <path d="M32 8C24 20 17 29 17 39c0 10 7 17 15 17s15-7 15-17C47 29 40 20 32 8z" fill="currentColor"/>
+  <path d="M23 42c6 5 13 5 19 0" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+  <path d="M42 14c5 5 7 8 8 13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".45"/>
+  <circle cx="50" cy="19" r="3" fill="currentColor" opacity=".55"/>
+</svg></div>
     <div class="mMain">
       <div class="mLabel">ความฉ่ำ</div>
       <div id="juiceVal" class="mValue">-</div>
@@ -1069,7 +1188,12 @@ summary{padding:18px 18px}
     </div>
   </div>
   <div class="metric">
-    <div class="mIcon">◌</div>
+    <div class="mIcon iconHollow"><svg class="iconSvg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <circle cx="32" cy="32" r="22" fill="currentColor" opacity=".78"/>
+  <circle cx="32" cy="32" r="11" fill="#fff" opacity=".9"/>
+  <circle cx="32" cy="32" r="8" fill="currentColor"/>
+  <g fill="#fff" opacity=".38"><circle cx="20" cy="23" r="1.7"/><circle cx="45" cy="25" r="1.7"/><circle cx="18" cy="40" r="1.4"/><circle cx="43" cy="44" r="1.4"/><circle cx="27" cy="15" r="1.2"/><circle cx="37" cy="50" r="1.2"/></g>
+</svg></div>
     <div class="mMain">
       <div class="mLabel">โพรงภายใน</div>
       <div id="hollowVal" class="mValue emph">-</div>
@@ -1079,7 +1203,10 @@ summary{padding:18px 18px}
     </div>
   </div>
   <div class="metric wide">
-    <div class="mIcon">🛡</div>
+    <div class="mIcon iconTrust"><svg class="iconSvg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  <path d="M32 8l22 8v14c0 14-9 24-22 29C19 54 10 44 10 30V16l22-8z" fill="currentColor"/>
+  <path d="M22 32l7 7 14-16" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></div>
     <div class="mMain">
       <div class="mLabel">ความเชื่อมั่น</div>
       <div id="confVal" class="mValue good">-</div>
@@ -2186,7 +2313,7 @@ function analyzeSession(){
     q_spread: Number(qSpread.toFixed(3)),
     tau_fallback_count: tauFallbackCount,
     measurement_status: warnLowQuality ? "ควรวัดซ้ำ" : "ใช้ได้",
-    model_version: "v2.29.8_RemoveTestBeepButton",
+    model_version: "v2.30.0_ModernIconUI",
     boundary_ripeness_zone: isBoundaryRipeness
   });
 
